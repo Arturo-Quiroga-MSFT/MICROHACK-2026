@@ -5,6 +5,7 @@ and Intent Resolution evaluators (matching the original sample).
 import os
 import time
 import json
+from pathlib import Path
 from pprint import pprint
 from dotenv import load_dotenv
 
@@ -19,6 +20,91 @@ from openai.types.eval_create_params import DataSourceConfigCustom
 
 # Load environment variables
 load_dotenv()
+
+
+def _verify_deployment_works(client, deployment_name: str) -> None:
+    # Fast preflight so we don't start an eval that will inevitably 404.
+    # Uses minimal tokens and a simple prompt.
+    try:
+        client.chat.completions.create(
+            model=deployment_name,
+            messages=[{"role": "user", "content": "ping"}],
+            max_tokens=1,
+        )
+        print(f"✓ Deployment preflight OK: {deployment_name}\n")
+    except Exception as ex:
+        raise RuntimeError(
+            "Deployment preflight failed. The project-connected Azure OpenAI resource "
+            "cannot access the deployment name you provided.\n"
+            "Double-check AZURE_AI_MODEL_DEPLOYMENT_NAME and confirm the deployment exists "
+            "in the same Azure OpenAI resource that this AI Project is connected to.\n"
+            "If you created the deployment very recently, wait ~5 minutes and retry.\n"
+            f"Underlying error: {ex}"
+        )
+
+
+def _to_jsonable(obj):
+    if obj is None:
+        return None
+    # OpenAI SDK objects are usually Pydantic models (v2) and support model_dump().
+    if hasattr(obj, "model_dump"):
+        try:
+            return obj.model_dump(mode="json")
+        except TypeError:
+            return obj.model_dump()
+    if hasattr(obj, "dict"):
+        try:
+            return obj.dict()
+        except TypeError:
+            pass
+    if isinstance(obj, (str, int, float, bool)):
+        return obj
+    if isinstance(obj, (list, tuple)):
+        return [_to_jsonable(x) for x in obj]
+    if isinstance(obj, dict):
+        return {str(k): _to_jsonable(v) for k, v in obj.items()}
+    if hasattr(obj, "__dict__"):
+        return _to_jsonable(vars(obj))
+    return str(obj)
+
+
+def _build_summary(output_items):
+    # output_items: list[OutputItemListResponse]
+    criteria = {}
+    totals = {"passed": 0, "failed": 0, "errored": 0, "total": 0}
+
+    for item in output_items or []:
+        results = getattr(item, "results", None) or []
+        for r in results:
+            name = getattr(r, "name", "unknown") or "unknown"
+            base = name.split("-", 1)[0]
+            c = criteria.setdefault(base, {"passed": 0, "failed": 0, "errored": 0, "total": 0})
+
+            passed = getattr(r, "passed", None)
+            sample = getattr(r, "sample", None) or {}
+            error = None
+            if isinstance(sample, dict):
+                error = sample.get("error")
+
+            if error:
+                c["errored"] += 1
+                totals["errored"] += 1
+            elif passed is True:
+                c["passed"] += 1
+                totals["passed"] += 1
+            else:
+                c["failed"] += 1
+                totals["failed"] += 1
+
+            c["total"] += 1
+            totals["total"] += 1
+
+    # Add simple rates
+    for c in criteria.values():
+        c["pass_rate"] = (c["passed"] / c["total"]) if c["total"] else 0.0
+    totals["pass_rate"] = (totals["passed"] / totals["total"]) if totals["total"] else 0.0
+
+    return {"totals": totals, "criteria": criteria}
 
 def main():
     endpoint = os.environ.get("AZURE_AI_PROJECT_ENDPOINT")
@@ -35,6 +121,8 @@ def main():
         AIProjectClient(endpoint=endpoint, credential=credential) as project_client,
         project_client.get_openai_client(api_version="2025-04-01-preview") as client,
     ):
+        _verify_deployment_works(client, model_deployment_name)
+
         # Define the data schema
         data_source_config = DataSourceConfigCustom(
             {
@@ -86,8 +174,8 @@ def main():
                     {"content": "{{item.query}}", "role": "user"},
                     {"content": "{{item.response}}", "role": "assistant"}
                 ],
-                "labels": ["1", "2", "3", "4", "5"],
-                "passing_labels": ["5", "4", "3"]
+                "labels": ["1", "2", "3"],
+                "passing_labels": ["2", "3"]
             },
             {
                 "type": "label_model",
@@ -98,8 +186,8 @@ def main():
                     {"content": "{{item.response}}", "role": "assistant"},
                     {"content": "{{item.context}}", "role": "system"}
                 ],
-                "labels": ["1", "2", "3", "4", "5"],
-                "passing_labels": ["5", "4", "3"]
+                "labels": ["1", "2", "3"],
+                "passing_labels": ["2", "3"]
             },
             {
                 "type": "label_model",
@@ -109,8 +197,8 @@ def main():
                     {"content": "{{item.query}}", "role": "user"},
                     {"content": "{{item.response}}", "role": "assistant"}
                 ],
-                "labels": ["1", "2", "3", "4", "5"],
-                "passing_labels": ["5", "4", "3"]
+                "labels": ["1", "2", "3"],
+                "passing_labels": ["2", "3"]
             }
         ]
 
@@ -180,6 +268,30 @@ def main():
                     if output_items:
                         print("\nFirst result sample:")
                         pprint(output_items[0])
+
+                    # Persist full results to disk
+                    out_dir = Path(__file__).resolve().parent / "out"
+                    out_dir.mkdir(parents=True, exist_ok=True)
+                    artifact_path = out_dir / f"eval_{eval_object.id}__run_{run.id}.json"
+                    summary_path = out_dir / f"eval_{eval_object.id}__run_{run.id}.summary.json"
+                    artifact = {
+                        "saved_at_unix": int(time.time()),
+                        "eval": _to_jsonable(eval_object),
+                        "run": _to_jsonable(run),
+                        "output_items": _to_jsonable(output_items),
+                    }
+                    artifact_path.write_text(json.dumps(artifact, indent=2, ensure_ascii=False), encoding="utf-8")
+                    summary = {
+                        "saved_at_unix": int(time.time()),
+                        "eval_id": eval_object.id,
+                        "run_id": run.id,
+                        "run_status": run.status,
+                        "result_counts": _to_jsonable(getattr(run, "result_counts", None)),
+                        "summary": _to_jsonable(_build_summary(output_items)),
+                    }
+                    summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+                    print(f"\n✓ Saved full evaluation artifact to: {artifact_path}")
+                    print(f"✓ Saved summary artifact to: {summary_path}")
                 
                 break
                 

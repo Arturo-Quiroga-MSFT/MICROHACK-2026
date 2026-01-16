@@ -1,0 +1,44 @@
+{
+  "saved_at_unix": 1768584496,
+  "eval_id": "eval_696a7513761c819192ab3d48b63f3ea5",
+  "run_id": "evalrun_696a75168e948191a90287f37ec6d151",
+  "run_status": "completed",
+  "result_counts": {
+    "errored": 0,
+    "failed": 3,
+    "passed": 0,
+    "total": 3
+  },
+  "summary": {
+    "totals": {
+      "passed": 2,
+      "failed": 7,
+      "errored": 0,
+      "total": 9,
+      "pass_rate": 0.2222222222222222
+    },
+    "criteria": {
+      "coherence": {
+        "passed": 1,
+        "failed": 2,
+        "errored": 0,
+        "total": 3,
+        "pass_rate": 0.3333333333333333
+      },
+      "relevance": {
+        "passed": 1,
+        "failed": 2,
+        "errored": 0,
+        "total": 3,
+        "pass_rate": 0.3333333333333333
+      },
+      "intent_resolution": {
+        "passed": 0,
+        "failed": 3,
+        "errored": 0,
+        "total": 3,
+        "pass_rate": 0.0
+      }
+    }
+  }
+}

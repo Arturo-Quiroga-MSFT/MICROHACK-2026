@@ -1,0 +1,613 @@
+{
+  "saved_at_unix": 1768583991,
+  "eval": {
+    "id": "eval_696a731d99048191b2f893d08dadd7a7",
+    "created_at": 1768583965,
+    "data_source_config": {
+      "schema_": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              },
+              "response": {
+                "type": "string"
+              },
+              "context": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "query",
+              "response",
+              "context"
+            ]
+          }
+        },
+        "required": [
+          "item"
+        ]
+      },
+      "type": "custom",
+      "max_items": null
+    },
+    "metadata": {},
+    "name": "SDK Test - Multi-Evaluator (Coherence, Relevance, Intent)",
+    "object": "eval",
+    "testing_criteria": [
+      {
+        "input": [
+          {
+            "content": "{{item.query}}",
+            "role": "user",
+            "type": "message"
+          },
+          {
+            "content": "{{item.response}}",
+            "role": "assistant",
+            "type": "message"
+          }
+        ],
+        "labels": [
+          "1",
+          "2",
+          "3"
+        ],
+        "model": "gpt-4.1",
+        "name": "coherence",
+        "passing_labels": [
+          "2",
+          "3"
+        ],
+        "type": "label_model",
+        "id": "coherence-de05cf4a-0a45-4ab4-8dab-731448509f5a",
+        "inactive_at": null,
+        "sampling_params": null
+      },
+      {
+        "input": [
+          {
+            "content": "{{item.query}}",
+            "role": "user",
+            "type": "message"
+          },
+          {
+            "content": "{{item.response}}",
+            "role": "assistant",
+            "type": "message"
+          },
+          {
+            "content": "{{item.context}}",
+            "role": "system",
+            "type": "message"
+          }
+        ],
+        "labels": [
+          "1",
+          "2",
+          "3"
+        ],
+        "model": "gpt-4.1",
+        "name": "relevance",
+        "passing_labels": [
+          "2",
+          "3"
+        ],
+        "type": "label_model",
+        "id": "relevance-ef12d410-3fc6-4df7-90b2-5a89789d25fb",
+        "inactive_at": null,
+        "sampling_params": null
+      },
+      {
+        "input": [
+          {
+            "content": "{{item.query}}",
+            "role": "user",
+            "type": "message"
+          },
+          {
+            "content": "{{item.response}}",
+            "role": "assistant",
+            "type": "message"
+          }
+        ],
+        "labels": [
+          "1",
+          "2",
+          "3"
+        ],
+        "model": "gpt-4.1",
+        "name": "intent_resolution",
+        "passing_labels": [
+          "2",
+          "3"
+        ],
+        "type": "label_model",
+        "id": "intent_resolution-b0bc30ee-f71b-403d-b906-62fd14329df2",
+        "inactive_at": null,
+        "sampling_params": null
+      }
+    ]
+  },
+  "run": {
+    "id": "evalrun_696a731fff448191b66ce760cf8de53d",
+    "created_at": 1768583968,
+    "data_source": {
+      "source": {
+        "content": [
+          {
+            "item": {
+              "query": "How do you create a run?",
+              "context": "AML API only",
+              "response": "To create a run using the Azure Machine Learning API, you first need to create an Experiment. Once you have an experiment, you can create a Run object that is associated with that experiment. Here is some Python code that demonstrates this process:\n\n```\nfrom azureml.core import Experiment, Run\nfrom azureml.core.workspace import Workspace\n\n# Define workspace and experiment\nws = Workspace.from_config()\nexp = Experiment(workspace=ws, name='my_experiment')\n\n# Create a new run\nrun = exp.start_logging()\n```\n\nIn this code, the `from_config()` method reads the configuration file that you created when you set up your Azure Machine Learning workspace. The `Experiment` constructor creates an Experiment object that is associated with your workspace, and the `start_logging()` method creates a new Run object that is associated with the Experiment. Now you can use the `run` object to log metrics, upload files, and track other information related to your machine learning experiment.",
+              "ground_truth": "Paris is the capital of France."
+            },
+            "sample": null
+          },
+          {
+            "item": {
+              "query": "How do you log a model?",
+              "context": "Logging can be done using any OSS Sdk",
+              "response": "There are a few ways to log models in Azure Machine Learning. \n\nOne way is to use the `register_model()` method of the `Run` object. The `register_model()` method logs a model file in the Azure Machine Learning service workspace and makes it available for deployment. Here's an example:\n\n```python\nfrom azureml.core import Model\n\nmodel_path = './outputs/my_model.pkl'\nmodel = Model.register(workspace=ws, model_path=model_path, model_name='my_model')\n```\n\nThis code registers the model file located at `model_path` to the Azure Machine Learning service workspace with the name `my_model`. \n\nAnother way to log a model is to save it as an output of a `Run`. If your model generation code is part of a script or Jupyter notebook that runs as an Azure Machine Learning experiment, you can save the model file as an output of the `Run` object. Here's an example:\n\n```python\nfrom sklearn.linear_model import LogisticRegression\nfrom azureml.core.run import Run\n\n# Initialize a run object\nrun = Run.get_context()\n\n# Train your model\nX_train, y_train = ...\nclf = LogisticRegression().fit(X_train, y_train)\n\n# Save the model to the Run object's outputs directory\nmodel_path = 'outputs/model.pkl'\njoblib.dump(value=clf, filename=model_path)\n\n# Log the model as a run artifact\nrun.upload_file(name=model_path, path_or_stream=model_path)\n```\n\nIn this code, `Run.get_context()` retrieves the current run context object, which you can use to track metadata and metrics for the run. After training your model, you can use `joblib.dump()` to save the model to a file, and then log the file as an artifact of the run using `run.upload_file()`.",
+              "ground_truth": "Paris is the capital of France."
+            },
+            "sample": null
+          },
+          {
+            "item": {
+              "query": "What is the capital of France?",
+              "context": "France is in Europe",
+              "response": "Paris is the capital of France.",
+              "ground_truth": "Paris is the capital of France."
+            },
+            "sample": null
+          }
+        ],
+        "type": "file_content"
+      },
+      "type": "jsonl"
+    },
+    "error": null,
+    "eval_id": "eval_696a731d99048191b2f893d08dadd7a7",
+    "metadata": {
+      "test": "sdk_creation",
+      "created_by": "evaluation_checker"
+    },
+    "model": null,
+    "name": "sdk_test_run",
+    "object": "eval.run",
+    "per_model_usage": [
+      {
+        "cached_tokens": 0,
+        "completion_tokens": 1174,
+        "invocation_count": 9,
+        "run_model_name": "gpt-4.1-2025-04-14",
+        "prompt_tokens": 2959,
+        "total_tokens": 4133,
+        "model_name": "gpt-4.1-2025-04-14",
+        "deployment_name": "gpt-4.1"
+      }
+    ],
+    "per_testing_criteria_results": [
+      {
+        "failed": 1,
+        "passed": 2,
+        "testing_criteria": "coherence-de05cf4a-0a45-4ab4-8dab-731448509f5a",
+        "testing_criteria_id": "coherence-de05cf4a-0a45-4ab4-8dab-731448509f5a"
+      },
+      {
+        "failed": 2,
+        "passed": 1,
+        "testing_criteria": "relevance-ef12d410-3fc6-4df7-90b2-5a89789d25fb",
+        "testing_criteria_id": "relevance-ef12d410-3fc6-4df7-90b2-5a89789d25fb"
+      },
+      {
+        "failed": 2,
+        "passed": 1,
+        "testing_criteria": "intent_resolution-b0bc30ee-f71b-403d-b906-62fd14329df2",
+        "testing_criteria_id": "intent_resolution-b0bc30ee-f71b-403d-b906-62fd14329df2"
+      }
+    ],
+    "report_url": "https://ai.azure.com/resource/evaluation",
+    "result_counts": {
+      "errored": 0,
+      "failed": 3,
+      "passed": 0,
+      "total": 3
+    },
+    "status": "completed",
+    "shared_with_openai": false
+  },
+  "output_items": [
+    {
+      "id": "outputitem_696a732e18008191a490ce881f97080c",
+      "created_at": 1768583982,
+      "datasource_item": {
+        "query": "How do you create a run?",
+        "context": "AML API only",
+        "response": "To create a run using the Azure Machine Learning API, you first need to create an Experiment. Once you have an experiment, you can create a Run object that is associated with that experiment. Here is some Python code that demonstrates this process:\n\n```\nfrom azureml.core import Experiment, Run\nfrom azureml.core.workspace import Workspace\n\n# Define workspace and experiment\nws = Workspace.from_config()\nexp = Experiment(workspace=ws, name='my_experiment')\n\n# Create a new run\nrun = exp.start_logging()\n```\n\nIn this code, the `from_config()` method reads the configuration file that you created when you set up your Azure Machine Learning workspace. The `Experiment` constructor creates an Experiment object that is associated with your workspace, and the `start_logging()` method creates a new Run object that is associated with the Experiment. Now you can use the `run` object to log metrics, upload files, and track other information related to your machine learning experiment.",
+        "ground_truth": "Paris is the capital of France."
+      },
+      "datasource_item_id": 0,
+      "eval_id": "eval_696a731d99048191b2f893d08dadd7a7",
+      "object": "eval.run.output_item",
+      "results": [
+        {
+          "name": "coherence-de05cf4a-0a45-4ab4-8dab-731448509f5a",
+          "passed": true,
+          "score": 1.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "How do you create a run?"
+              },
+              {
+                "role": "assistant",
+                "content": "To create a run using the Azure Machine Learning API, you first need to create an Experiment. Once you have an experiment, you can create a Run object that is associated with that experiment. Here is some Python code that demonstrates this process:\n\n```\nfrom azureml.core import Experiment, Run\nfrom azureml.core.workspace import Workspace\n\n# Define workspace and experiment\nws = Workspace.from_config()\nexp = Experiment(workspace=ws, name='my_experiment')\n\n# Create a new run\nrun = exp.start_logging()\n```\n\nIn this code, the `from_config()` method reads the configuration file that you created when you set up your Azure Machine Learning workspace. The `Experiment` constructor creates an Experiment object that is associated with your workspace, and the `start_logging()` method creates a new Run object that is associated with the Experiment. Now you can use the `run` object to log metrics, upload files, and track other information related to your machine learning experiment."
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"The user's question, 'How do you create a run?', is general and lacks context about the domain or platform (for example, 'run' could relate to programming, sports, experiments, etc.).\",\"conclusion\":\"The question is ambiguous and cannot be definitively answered without more information.\"}],\"result\":\"2\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 403,
+              "completion_tokens": 71,
+              "prompt_tokens": 332,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        },
+        {
+          "name": "relevance-ef12d410-3fc6-4df7-90b2-5a89789d25fb",
+          "passed": false,
+          "score": 0.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "How do you create a run?"
+              },
+              {
+                "role": "assistant",
+                "content": "To create a run using the Azure Machine Learning API, you first need to create an Experiment. Once you have an experiment, you can create a Run object that is associated with that experiment. Here is some Python code that demonstrates this process:\n\n```\nfrom azureml.core import Experiment, Run\nfrom azureml.core.workspace import Workspace\n\n# Define workspace and experiment\nws = Workspace.from_config()\nexp = Experiment(workspace=ws, name='my_experiment')\n\n# Create a new run\nrun = exp.start_logging()\n```\n\nIn this code, the `from_config()` method reads the configuration file that you created when you set up your Azure Machine Learning workspace. The `Experiment` constructor creates an Experiment object that is associated with your workspace, and the `start_logging()` method creates a new Run object that is associated with the Experiment. Now you can use the `run` object to log metrics, upload files, and track other information related to your machine learning experiment."
+              },
+              {
+                "role": "system",
+                "content": "AML API only"
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"User asks about creating a run and the context indicates they want to know how to do this via the AML (Azure Machine Learning) API only, not via the Python SDK or other tools.\",\"conclusion\":\"Response must reference only direct API calls (REST API), not SDK code.\"},{\"description\":\"To create a run using the AML REST API, one generally needs to submit an experiment run (also called a job) via the appropriate endpoint, e.g., POST /subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/jobs.\",\"conclusion\":\"The user would need to authenticate and then issue a POST request with a JSON payload describing the run/job.\"},{\"description\":\"A minimal example involves: authenticating with Azure, calling the job submission endpoint, and providing a body detailing the experiment/job specification.\",\"conclusion\":\"The example should show a REST API POST and mention required request parameters/payload.\"}],\"result\":\"1\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 543,
+              "completion_tokens": 204,
+              "prompt_tokens": 339,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        },
+        {
+          "name": "intent_resolution-b0bc30ee-f71b-403d-b906-62fd14329df2",
+          "passed": true,
+          "score": 1.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "How do you create a run?"
+              },
+              {
+                "role": "assistant",
+                "content": "To create a run using the Azure Machine Learning API, you first need to create an Experiment. Once you have an experiment, you can create a Run object that is associated with that experiment. Here is some Python code that demonstrates this process:\n\n```\nfrom azureml.core import Experiment, Run\nfrom azureml.core.workspace import Workspace\n\n# Define workspace and experiment\nws = Workspace.from_config()\nexp = Experiment(workspace=ws, name='my_experiment')\n\n# Create a new run\nrun = exp.start_logging()\n```\n\nIn this code, the `from_config()` method reads the configuration file that you created when you set up your Azure Machine Learning workspace. The `Experiment` constructor creates an Experiment object that is associated with your workspace, and the `start_logging()` method creates a new Run object that is associated with the Experiment. Now you can use the `run` object to log metrics, upload files, and track other information related to your machine learning experiment."
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"The question asks 'How do you create a run?' but does not specify the context (e.g., running, exercise, programming, experiments, etc.).\",\"conclusion\":\"I need to check if the provided answer assumed a context accurately.\"},{\"description\":\"The provided answer assumes the context is Azure Machine Learning and explains how to create a 'Run' using its Python SDK.\",\"conclusion\":\"The answer is tailored to a specific context (Azure ML) not stated in the question. This could lead to misunderstanding if the user's intent was different.\"},{\"description\":\"The answer is technically correct if the user was asking about Azure ML, but since the context isn't specified and the answer doesn't clarify or ask for it, it may not be entirely helpful.\",\"conclusion\":\"The answer could benefit from clarifying the context or asking for it before proceeding.\"}],\"result\":\"2\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 512,
+              "completion_tokens": 180,
+              "prompt_tokens": 332,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        }
+      ],
+      "run_id": "evalrun_696a731fff448191b66ce760cf8de53d",
+      "sample": null,
+      "status": "fail",
+      "_datasource_item_content_hash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "available_includes": []
+    },
+    {
+      "id": "outputitem_696a732d86c48191a7dc0f60619c0753",
+      "created_at": 1768583982,
+      "datasource_item": {
+        "query": "How do you log a model?",
+        "context": "Logging can be done using any OSS Sdk",
+        "response": "There are a few ways to log models in Azure Machine Learning. \n\nOne way is to use the `register_model()` method of the `Run` object. The `register_model()` method logs a model file in the Azure Machine Learning service workspace and makes it available for deployment. Here's an example:\n\n```python\nfrom azureml.core import Model\n\nmodel_path = './outputs/my_model.pkl'\nmodel = Model.register(workspace=ws, model_path=model_path, model_name='my_model')\n```\n\nThis code registers the model file located at `model_path` to the Azure Machine Learning service workspace with the name `my_model`. \n\nAnother way to log a model is to save it as an output of a `Run`. If your model generation code is part of a script or Jupyter notebook that runs as an Azure Machine Learning experiment, you can save the model file as an output of the `Run` object. Here's an example:\n\n```python\nfrom sklearn.linear_model import LogisticRegression\nfrom azureml.core.run import Run\n\n# Initialize a run object\nrun = Run.get_context()\n\n# Train your model\nX_train, y_train = ...\nclf = LogisticRegression().fit(X_train, y_train)\n\n# Save the model to the Run object's outputs directory\nmodel_path = 'outputs/model.pkl'\njoblib.dump(value=clf, filename=model_path)\n\n# Log the model as a run artifact\nrun.upload_file(name=model_path, path_or_stream=model_path)\n```\n\nIn this code, `Run.get_context()` retrieves the current run context object, which you can use to track metadata and metrics for the run. After training your model, you can use `joblib.dump()` to save the model to a file, and then log the file as an artifact of the run using `run.upload_file()`.",
+        "ground_truth": "Paris is the capital of France."
+      },
+      "datasource_item_id": 1,
+      "eval_id": "eval_696a731d99048191b2f893d08dadd7a7",
+      "object": "eval.run.output_item",
+      "results": [
+        {
+          "name": "coherence-de05cf4a-0a45-4ab4-8dab-731448509f5a",
+          "passed": true,
+          "score": 1.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "How do you log a model?"
+              },
+              {
+                "role": "assistant",
+                "content": "There are a few ways to log models in Azure Machine Learning. \n\nOne way is to use the `register_model()` method of the `Run` object. The `register_model()` method logs a model file in the Azure Machine Learning service workspace and makes it available for deployment. Here's an example:\n\n```python\nfrom azureml.core import Model\n\nmodel_path = './outputs/my_model.pkl'\nmodel = Model.register(workspace=ws, model_path=model_path, model_name='my_model')\n```\n\nThis code registers the model file located at `model_path` to the Azure Machine Learning service workspace with the name `my_model`. \n\nAnother way to log a model is to save it as an output of a `Run`. If your model generation code is part of a script or Jupyter notebook that runs as an Azure Machine Learning experiment, you can save the model file as an output of the `Run` object. Here's an example:\n\n```python\nfrom sklearn.linear_model import LogisticRegression\nfrom azureml.core.run import Run\n\n# Initialize a run object\nrun = Run.get_context()\n\n# Train your model\nX_train, y_train = ...\nclf = LogisticRegression().fit(X_train, y_train)\n\n# Save the model to the Run object's outputs directory\nmodel_path = 'outputs/model.pkl'\njoblib.dump(value=clf, filename=model_path)\n\n# Log the model as a run artifact\nrun.upload_file(name=model_path, path_or_stream=model_path)\n```\n\nIn this code, `Run.get_context()` retrieves the current run context object, which you can use to track metadata and metrics for the run. After training your model, you can use `joblib.dump()` to save the model to a file, and then log the file as an artifact of the run using `run.upload_file()`."
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"Interpret the user's question: 'How do you log a model?' The user did not specify a particular framework or platform (e.g., MLflow, TensorFlow, scikit-learn, Azure ML).\",\"conclusion\":\"The question is general and ambiguous; it could apply to different machine learning operation contexts.\"},{\"description\":\"Typical model logging means saving the model's artifact and possibly recording metadata (version, parameters, metrics) to a system (e.g., a tracking server).\",\"conclusion\":\"Logging a model generally involves storing the model and its relevant information.\"},{\"description\":\"The response provided explains two ways to log models in Azure Machine Learning specifically: (a) registering the model (Model.register), and (b) saving and uploading the model as a run artifact. It gives code samples and context for both methods.\",\"conclusion\":\"The response assumes the user is referring to Azure Machine Learning and provides a practical, technical answer for that platform.\"}],\"result\":\"2\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 705,
+              "completion_tokens": 203,
+              "prompt_tokens": 502,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        },
+        {
+          "name": "relevance-ef12d410-3fc6-4df7-90b2-5a89789d25fb",
+          "passed": true,
+          "score": 1.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "How do you log a model?"
+              },
+              {
+                "role": "assistant",
+                "content": "There are a few ways to log models in Azure Machine Learning. \n\nOne way is to use the `register_model()` method of the `Run` object. The `register_model()` method logs a model file in the Azure Machine Learning service workspace and makes it available for deployment. Here's an example:\n\n```python\nfrom azureml.core import Model\n\nmodel_path = './outputs/my_model.pkl'\nmodel = Model.register(workspace=ws, model_path=model_path, model_name='my_model')\n```\n\nThis code registers the model file located at `model_path` to the Azure Machine Learning service workspace with the name `my_model`. \n\nAnother way to log a model is to save it as an output of a `Run`. If your model generation code is part of a script or Jupyter notebook that runs as an Azure Machine Learning experiment, you can save the model file as an output of the `Run` object. Here's an example:\n\n```python\nfrom sklearn.linear_model import LogisticRegression\nfrom azureml.core.run import Run\n\n# Initialize a run object\nrun = Run.get_context()\n\n# Train your model\nX_train, y_train = ...\nclf = LogisticRegression().fit(X_train, y_train)\n\n# Save the model to the Run object's outputs directory\nmodel_path = 'outputs/model.pkl'\njoblib.dump(value=clf, filename=model_path)\n\n# Log the model as a run artifact\nrun.upload_file(name=model_path, path_or_stream=model_path)\n```\n\nIn this code, `Run.get_context()` retrieves the current run context object, which you can use to track metadata and metrics for the run. After training your model, you can use `joblib.dump()` to save the model to a file, and then log the file as an artifact of the run using `run.upload_file()`."
+              },
+              {
+                "role": "system",
+                "content": "Logging can be done using any OSS Sdk"
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"The user's question is about general model logging practices. Logging a model can mean different things depending on the framework or environment in use. The first answer provided detailed steps for logging a model in Azure Machine Learning using its SDK, and explained how models can be registered and saved as artifacts.\",\"conclusion\":\"The explanation includes steps and reasoning that match real usage in Azure Machine Learning, clearly outlining how one can log a model.\"},{\"description\":\"The follow-up statement, 'Logging can be done using any OSS Sdk,' is a generalization - it is technically accurate but vague. While many open-source SDKs/frameworks such as TensorFlow, PyTorch, MLflow, and others allow you to log or save models, the process and specifics vary, and the usefulness of the answer depends on context.\",\"conclusion\":\"The follow-up is correct but lacks substantive details compared to the original step-by-step Azure-specific explanation.\"}],\"result\":\"2\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 710,
+              "completion_tokens": 195,
+              "prompt_tokens": 515,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        },
+        {
+          "name": "intent_resolution-b0bc30ee-f71b-403d-b906-62fd14329df2",
+          "passed": false,
+          "score": 0.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "How do you log a model?"
+              },
+              {
+                "role": "assistant",
+                "content": "There are a few ways to log models in Azure Machine Learning. \n\nOne way is to use the `register_model()` method of the `Run` object. The `register_model()` method logs a model file in the Azure Machine Learning service workspace and makes it available for deployment. Here's an example:\n\n```python\nfrom azureml.core import Model\n\nmodel_path = './outputs/my_model.pkl'\nmodel = Model.register(workspace=ws, model_path=model_path, model_name='my_model')\n```\n\nThis code registers the model file located at `model_path` to the Azure Machine Learning service workspace with the name `my_model`. \n\nAnother way to log a model is to save it as an output of a `Run`. If your model generation code is part of a script or Jupyter notebook that runs as an Azure Machine Learning experiment, you can save the model file as an output of the `Run` object. Here's an example:\n\n```python\nfrom sklearn.linear_model import LogisticRegression\nfrom azureml.core.run import Run\n\n# Initialize a run object\nrun = Run.get_context()\n\n# Train your model\nX_train, y_train = ...\nclf = LogisticRegression().fit(X_train, y_train)\n\n# Save the model to the Run object's outputs directory\nmodel_path = 'outputs/model.pkl'\njoblib.dump(value=clf, filename=model_path)\n\n# Log the model as a run artifact\nrun.upload_file(name=model_path, path_or_stream=model_path)\n```\n\nIn this code, `Run.get_context()` retrieves the current run context object, which you can use to track metadata and metrics for the run. After training your model, you can use `joblib.dump()` to save the model to a file, and then log the file as an artifact of the run using `run.upload_file()`."
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"Interpret the question: 'How do you log a model?' is a technical question asking for instructions on logging models, likely in the context of machine learning or model management.\",\"conclusion\":\"Determine that an informational, step-by-step explanation with example code is appropriate.\"},{\"description\":\"Address the main topic: Discuss possible platforms or libraries (e.g., MLflow, Azure ML, etc.), but focus on general guidance and code for a common approach (e.g., MLflow).\",\"conclusion\":\"Provide a concise explanation and example, for instance, using MLflow's `mlflow.log_model()`.\"},{\"description\":\"Ensure no errors, disrespect, irrelevant tangents, or misleading statements are present. Check that the information is accurate and helpful.\",\"conclusion\":\"Response meets requirements, is factual, instructional, and respectful.\"}],\"result\":\"1\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 678,
+              "completion_tokens": 176,
+              "prompt_tokens": 502,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        }
+      ],
+      "run_id": "evalrun_696a731fff448191b66ce760cf8de53d",
+      "sample": null,
+      "status": "fail",
+      "_datasource_item_content_hash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "available_includes": []
+    },
+    {
+      "id": "outputitem_696a732b22f88191a3dabe5783b9918f",
+      "created_at": 1768583979,
+      "datasource_item": {
+        "query": "What is the capital of France?",
+        "context": "France is in Europe",
+        "response": "Paris is the capital of France.",
+        "ground_truth": "Paris is the capital of France."
+      },
+      "datasource_item_id": 2,
+      "eval_id": "eval_696a731d99048191b2f893d08dadd7a7",
+      "object": "eval.run.output_item",
+      "results": [
+        {
+          "name": "coherence-de05cf4a-0a45-4ab4-8dab-731448509f5a",
+          "passed": false,
+          "score": 0.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "What is the capital of France?"
+              },
+              {
+                "role": "assistant",
+                "content": "Paris is the capital of France."
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"The question asks for the capital of France, which is general knowledge.\",\"conclusion\":\"The capital of France is Paris.\"}],\"result\":\"1\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 180,
+              "completion_tokens": 37,
+              "prompt_tokens": 143,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        },
+        {
+          "name": "relevance-ef12d410-3fc6-4df7-90b2-5a89789d25fb",
+          "passed": false,
+          "score": 0.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "What is the capital of France?"
+              },
+              {
+                "role": "assistant",
+                "content": "Paris is the capital of France."
+              },
+              {
+                "role": "system",
+                "content": "France is in Europe"
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"The statement 'France is in Europe' provides a basic factual assertion about the geographical location of France.\",\"conclusion\":\"France is geographically located in Europe.\"},{\"description\":\"This information is simple, straightforward, and factual, without context about controversial topics or historical disputes.\",\"conclusion\":\"The claim is accurate and widely accepted.\"}],\"result\":\"1\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 227,
+              "completion_tokens": 76,
+              "prompt_tokens": 151,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        },
+        {
+          "name": "intent_resolution-b0bc30ee-f71b-403d-b906-62fd14329df2",
+          "passed": false,
+          "score": 0.0,
+          "sample": {
+            "input": [
+              {
+                "role": "user",
+                "content": "What is the capital of France?"
+              },
+              {
+                "role": "assistant",
+                "content": "Paris is the capital of France."
+              }
+            ],
+            "output": [
+              {
+                "role": "assistant",
+                "content": "{\"steps\":[{\"description\":\"The question asks for the capital of France.\",\"conclusion\":\"The capital of France is Paris.\"}],\"result\":\"1\"}"
+              }
+            ],
+            "finish_reason": "stop",
+            "model": "gpt-4.1-2025-04-14",
+            "usage": {
+              "total_tokens": 175,
+              "completion_tokens": 32,
+              "prompt_tokens": 143,
+              "cached_tokens": 0
+            },
+            "error": null,
+            "temperature": 1.0,
+            "top_p": 1.0
+          },
+          "type": null
+        }
+      ],
+      "run_id": "evalrun_696a731fff448191b66ce760cf8de53d",
+      "sample": null,
+      "status": "fail",
+      "_datasource_item_content_hash": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "available_includes": []
+    }
+  ]
+}

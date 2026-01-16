@@ -1,0 +1,67 @@
+{
+  "data": {
+    "aoai_resource_name": "",
+    "id": "azureai://accounts/cog-v2jd2jfni7slw/projects/cog-v2jd2jfni7slw-project/data/sdk-test-cloud-eval-data-20260116_181701_UTC/versions/1",
+    "type": "Dataset"
+  },
+  "data_source_config": null,
+  "description": "Created via Evaluations REST API (cloud evaluation run).",
+  "displayName": "sdk-test-cloud-evaluation-20260116_181701_UTC",
+  "evaluators": {
+    "coherence": {
+      "dataMapping": {
+        "query": "${data.query}",
+        "response": "${data.response}"
+      },
+      "id": "azureai://built-in/evaluators/coherence",
+      "initParams": {
+        "deployment_name": "gpt-4.1"
+      }
+    },
+    "intent_resolution": {
+      "dataMapping": {
+        "query": "${data.query}",
+        "response": "${data.response}"
+      },
+      "id": "azureai://built-in/evaluators/intent_resolution",
+      "initParams": {
+        "deployment_name": "gpt-4.1"
+      }
+    },
+    "relevance": {
+      "dataMapping": {
+        "context": "${data.context}",
+        "query": "${data.query}",
+        "response": "${data.response}"
+      },
+      "id": "azureai://built-in/evaluators/relevance",
+      "initParams": {
+        "deployment_name": "gpt-4.1"
+      }
+    }
+  },
+  "id": "94e0699c-8dc9-4856-bd83-6688e229db38",
+  "outputs": {},
+  "properties": {
+    "AiStudioEvaluationUri": "https://ai.azure.com/resource/build/evaluation/94e0699c-8dc9-4856-bd83-6688e229db38?wsid=/subscriptions/7a28b21e-0d3e-4435-a686-d92889d4ee96/resourceGroups/rg-microhack/providers/Microsoft.CognitiveServices/accounts/cog-v2jd2jfni7slw/projects/cog-v2jd2jfni7slw-project&tid=a172a259-b1c7-4944-b2e1-6d551f954711",
+    "NetworkType": "Public",
+    "_azureml.evaluate_artifacts": "[{\"path\": \"instance_results.jsonl\", \"type\": \"table\"}]",
+    "_azureml.evaluation_name_map_0": "{\"coherence\":\"coherence\",\"relevance\":\"relevance\",\"intent_resolution\":\"intent_resolution\"}",
+    "_azureml.evaluation_name_map_length": "1",
+    "_azureml.evaluation_run": "evaluation.service",
+    "runType": "eval_run"
+  },
+  "status": "NotStarted",
+  "systemData": {
+    "createdAt": "01/16/2026 18:17:12 +00:00",
+    "createdBy": "System Administrator",
+    "modifiedAt": "",
+    "modifiedBy": "System Administrator"
+  },
+  "tags": {
+    "api": "aiprojects/evaluations.create",
+    "source": "sdk-test",
+    "ui_goal": "new-foundry-visibility"
+  },
+  "target": null
+}
