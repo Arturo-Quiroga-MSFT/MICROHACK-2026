@@ -1,0 +1,12 @@
+2. Sample Test Questions (from ground_truth.jsonl)
+Here are 10 test questions you can use to test your agent:
+
+"What protection does Contoso offer against balance billing?"
+"What is in-network mean for Northwind Health?"
+"What types of hearing care services are covered by the Northwind Standard plan?"
+"Does Northwind Health cover full costs?"
+"What types of rehabilitation therapy does Northwind Standard cover?"
+"What should I do if I need healthcare services outside Washington with Northwind Health?"
+"What are the coverage limitations of the Northwind Standard plan regarding clinical trials?"
+"What are the financial implications of choosing an out-of-network provider?"
+"What is Northwind Standard Benefits Details?"
