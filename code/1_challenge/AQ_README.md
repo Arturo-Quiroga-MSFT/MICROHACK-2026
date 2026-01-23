@@ -317,16 +317,57 @@ These controls represent the **minimum settings** required for compliance.
 
 ![Upload Ground Truth](/media/CH1_truth.png)
 
-### Step 8.2: Configure and Run Evaluation
+### Step 8.2: Configure Field Mappings
 
-1. Review the evaluation configuration
-2. Select evaluation metrics:
-   - **Relevance** - Are responses relevant to the question?
-   - **Groundedness** - Are responses grounded in source documents?
-   - **Citation quality** - Are citations accurate?
-   - **Safety** - Are responses safe and appropriate?
-3. Click **"Run evaluation"**
-4. Wait for completion (typically 5-10 minutes)
+After uploading your dataset, you'll need to map your data fields to the evaluation framework.
+
+**Field Mapping Configuration**:
+
+1. **Judge model**: Select your evaluation model (e.g., `gpt-4o` or `gpt-5.2-chat`)
+   - This model will grade the responses
+
+2. **Auto-detected field mappings** (Foundry will suggest these):
+   
+   | Field | Mapping | Description |
+   |-------|---------|-------------|
+**What happens during evaluation:**
+- The judge model (e.g., gpt-4o) will process each question
+- Your agent generates responses
+- The judge compares responses against ground truth and evaluates quality
+- Metrics are calculated and aggregated
+
+### Step 8.5** | `{{item.question}}` | The user's question from ground_truth.jsonl |
+   | **Response** | `{{sample.output_text}}` | The agent's answer to evaluate |
+   | **Context** | `Not available` (optional) | Retrieved documents (if you want to test groundedness) |
+   | **Ground truth** | `{{item.truth}}` | The correct/expected answer from your dataset |
+   | **Tool calls** | `{{sample.tool_calls}}` | Agent's tool usage (automatically captured) |
+   | **Tool definitions** | `{{sample.tool_definitions}}` | Available tools (automatically captured) |
+
+3. **Review the mappings**:
+   - ✅ Query should map to your question field (`question` in ground_truth.jsonl)
+   - ✅ Ground truth should map to expected answer (`truth` in ground_truth.jsonl)
+   - ✅ Response will be auto-captured from agent outputs
+   - ⚠️ Context is optional but recommended for groundedness checks
+
+💡 **Tip**: The auto-detected mappings are usually correct. Just verify that `Query` maps to `{{item.question}}` and `Ground truth` maps to `{{item.truth}}`.
+
+### Step 8.3: Select Evaluation Metrics
+
+1. Choose the metrics you want to evaluate:
+   - ✅ **Relevance** - Are responses relevant to the question?
+   - ✅ **Groundedness** - Are responses grounded in source documents?
+   - ✅ **Citation quality** - Are citations accurate?
+   - ✅ **Safety** - Are responses safe and appropriate?
+   - ✅ **Coherence** - Are responses well-structured?
+   - ✅ **Fluency** - Is the language natural?
+
+2. Click **"Next"** to proceed
+
+### Step 8.4: Run the Evaluation
+
+1. Review your configuration
+2. Click **"Run evaluation"**
+3. Wait for completion (typically 5-10 minutes depending on dataset size)
 
 ![Run Evaluation](/media/CH1_Evaluation.png)
 

@@ -15,8 +15,9 @@ We will set up the initial environment for you to build on top of during your Mi
 1. An Azure subscription. If you don't have an Azure subscription, create a [free account](https://azure.microsoft.com/free/).
 1. Install the [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
 1. Install [Powershell 7 (supported on Windows, macOS, and Linux)](https://learn.microsoft.com/powershell/scripting/install/installing-powershell).
-1. Install [Python 3.13+](https://www.python.org/downloads/).
+1. Install [Python 3.13](https://www.python.org/downloads/).
 1. Install the Git CLI. You can download it from the [Git website](https://git-scm.com/downloads).
+1. Install Node.
 1. Install VS Code on your local PC if not using Codespaces.
 <br>
 
@@ -27,6 +28,10 @@ We will set up the initial environment for you to build on top of during your Mi
 * Git: Download Git
 * Python 3.13: Download Python
 <br>
+
+## Prerequisites for CodeSpaces
+1. An Azure subscription. If you don't have an Azure subscription, create a [free account](https://azure.microsoft.com/free/).
+1. Validate [Python 3.13+](https://www.python.org/downloads/) is setup in your environment or lower
 
 ## Recommended Regions
 * North Central US (northcentralus)
@@ -42,18 +47,31 @@ We will set up the initial environment for you to build on top of during your Mi
 * Optimal Region for availability should be WestEurope for Document Intelligence and Sweden Central for Infrastructure and Sweden Central for OpenAiLocation (Optimal due to OpenAI Availability)
 <br>
 
-* Alternative Region for availiability should be West US 2 for Document Intelligence and West US 2 for Infrastructure and West US 3 for OpenAiLocation
+* Alternative Region for availability should be West US 2 for Document Intelligence and West US 2 for Infrastructure and West US 3 for OpenAiLocation
 
 <br>
 
 ## Deploy the Azure Resources
 
-1. Open a terminal window and confirm prerequisites are complete
-1. Clone the ```azure-search-openai-demo``` repo into your local environment by running the following command:
+1. Start the Microhack on Local or Codespaces
 
-    ```bash
-    git clone https://github.com/Azure-Samples/azure-search-openai-demo.git
-    ```
+    a. Open a terminal window for local deployments and confirm prerequisites are complete
+        
+    * Fork the [Azure-Search-OpenAI-Demo](https://github.com/Azure-Samples/azure-search-openai-demo/) repo into your Github account
+        
+    * Clone the forked repo in your Github account to your environment by running the following command:
+
+    * ```git clone https://github.com/<Github username>/azure-search-openai-demo.git```
+
+    * At the terminal window confirm the home directory /azure-search-openai-demo
+    
+    b. For Codespaces, go into your web browser and login to github
+
+    * Fork the [Azure-Search-OpenAI-Demo](https://github.com/Azure-Samples/azure-search-openai-demo/) repo into your Github account
+        
+    * `Click on Code` (Green) button and click on `+` button (Create a codepspaces on main).  This will take a few minutes to provision a Codespaces instance.  At the bottom of the browers is a terminal window and will accept commands when provisioning is complete.
+
+    * At the terminal window confirm the home directory /azure-search-openai-demo
 
 1. Login to your Azure Account in the terminal window
 
@@ -67,7 +85,7 @@ We will set up the initial environment for you to build on top of during your Mi
     azd env new
     ```
 
-    Enter a name that will be used for the resource group.  This will create a new folder `.azure` folder and set it as the active environment for any calls to azd going forward.
+    Enter a name that will be used for the resource group.  This will create a new `.azure` folder and set it as the active environment for any calls to azd going forward.
 
 1. Configure the environment variables to setup the AI Judge or LLM evaluation model in your project.
 
@@ -80,7 +98,7 @@ We will set up the initial environment for you to build on top of during your Mi
     ```bash
     azd env set AZURE_OPENAI_EVAL_DEPLOYMENT_CAPACITY 100 
     ```
-1.  Setup Microsoft Foundry Project Endpoint in Environment file with Dummay value
+1.  Setup Microsoft Foundry Project Endpoint in Environment file
 
     ```bash
     azd env set AZURE_AI_PROJECT_ENDPOINT abc
@@ -94,7 +112,7 @@ We will set up the initial environment for you to build on top of during your Mi
 
     This will provision Azure resources and deploy this sample to those resources, including building the search index based on the files found in the `./data` folder.  
 
-1. Open URL for RAGCHAT applicaiton printed in the terminal consule similar to the below picture. Ask it a few questions per cards to ensure it return results.<br>
+1. Open URL for RAGCHAT application printed in the terminal console similar to the below picture. Ask it a few questions per cards to ensure it return results.<br>
 <br>
 <br>
 
@@ -104,7 +122,7 @@ We will set up the initial environment for you to build on top of during your Mi
 
 ## Deploy the Evaluation environment
 
-1. Make a new Python virtual environment and activiate it.  
+1. Make a new Python virtual environment and activate it.  
 
     ```bash
     python -m venv .evalenv
@@ -113,7 +131,7 @@ We will set up the initial environment for you to build on top of during your Mi
     ```bash
     source .evalenv/bin/activate
     ```
-1. Upload requirements file from Microhack repo to Azure-Search-OpenAI-Demo repo.  Microhack directory is ```/code/0_challenge/requirements.txt``` to ```/evals``` directory in RAGCHAT repo.  Critical this file is in the evals directory and replace existing file.
+1. Upload requirements file from Microhack repo to Azure-Search-OpenAI-Demo repo.  Microhack directory is ```/code/0_challenge/requirements.txt``` to ```/evals``` directory in RAGCHAT repo.  It is critical this file is in the evals directory and replace existing file.
     
     ```bash
     pip install -r evals/requirements.txt
@@ -143,12 +161,14 @@ We will set up the initial environment for you to build on top of during your Mi
 
 ## Setup Project Connections
 
-1. Setup Project Connections for these four resources; Foundry models, Azure AI Search, Azure Storage Account and App Insights.  All connections should use Entra ID except for AppInsights which uses an API Key.  
+1. Setup Project Connections for these four resources; Foundry models, Azure AI Search, Azure Storage Account and App Insights.  All connections should use Entra ID except for AppInsights which uses an API Key. 
+
+    Setup Project Connections in the V1 Foundry Portal.  Make sure the New Foundry Switch is "OFF" when setting the connections
 
 
     ![Alt text](/media/Project_Connections.jpg "Project Connections")
 
-1. Setup your Foundry Project to have access rights to the storage account thru the Foundry managed Identitiy.  First go into storage account and open Access Control (IAM) tab.  Click on Add button and select Add role assignment
+1. Setup your Foundry Project to have access rights to the storage account thru the Foundry managed identitiy.  First go into storage account and open Access Control (IAM) tab.  Click on Add button and select Add role assignment
 
     ![Alt text](/media/storageIAM.jpg "Storage Assignment")
 
@@ -163,11 +183,13 @@ We will set up the initial environment for you to build on top of during your Mi
 <br>
 <br>
 
-## Setup Upload Evaluation Scripts to Azure-Search-OpenAI-Demo Application repo
+## Upload Microhack code samples into Azure-Search-OpenAI-Demo Environment
 
-1. There are three python scripts for evaluations in the 0_challenge directory.  They are ```evaluatemh.py```, ```safety_evaluationmh.py``` and ```redteammh.py```.  Upload these files into the ```/evals``` directory in the Azure-Search-OpenAI-Demo repo.  These scripts will use the Azure Evaluation SDK and post the results into the Azure Foundry.  The existing files leverage a different SDK and save them locally and reason we will keep both files.
+1. There are three python scripts for evaluations in the 0_challenge directory.  They are ```evaluatemh.py```, ```safety_evaluationmh.py``` and ```redteammh.py```.  Upload these files into the ```/evals``` directory in the Azure-Search-OpenAI-Demo repo.  These scripts will use the Azure Evaluation SDK and post the results into the Azure Foundry.  The scripts without the mh suffix are the original files and required for continuous evaluations.  We want to keep both files
 
 1. There is one test file ```ground_truth_test.jsonl``` data set with two questions in the 0_challenge directory.  Upload this file into the ```/evals``` directory in the Azure-Search-OpenAI-Demo repo.  It is critical you upload this file since the python scripts are hard-coded with this file name and uploading it will shorten the runtime of the evaluations.
+
+1. Replace the ```evaluate.yaml``` in the 0_challenge directory with the same file in the Azure-Search-OpenAI-Demo repo.  The file directory in the Azure-Search-OpenAI-Demo repo is ```./.github/workflow```
 
 1. Open the environment files in the /.azure/<resource-group> directory and open the file.  Find the parameter called, ```AZURE_AI_PROJECT_ENDPOINT```.  Insert the Foundry project endpoint from the portal into this environment variable.
 
@@ -179,7 +201,7 @@ We will set up the initial environment for you to build on top of during your Mi
 1. Click on prompt cards to see if it returns answers to these questions. 
 1. Open Foundry Project to see model deployments.  Search for 'eval' as a model name
 1. Review Project Connections for right permissions per above screenshot
-1. Click on Monitor icon and click on the Resource Usage Tab.  For Model deployment, select select ```text-embedding-3-large```.  You should see numbers for Total requests and Total Token count
+1. Click on Monitor icon and click on the Resource Usage Tab.  For Model deployment, select ```text-embedding-3-large```.  You should see numbers for Total requests and Total Token count
 <br>
 
 ## Run the workshop
@@ -189,7 +211,7 @@ After you complete all the success criteria, follow the steps in the [Challenge 
 
 
 ## Related Azure Technology
-* Application Insight
+* Application Insights
 * Azure OpenAI
 * Container App & Registry
 * Document Intelligence
@@ -209,5 +231,9 @@ After you complete all the success criteria, follow the steps in the [Challenge 
 
 # CHALLENGE 0 COMPLETE!!!!!
 
+# Contributors to this Microhack
 
-<!-- These instructions assume there is no net new code for the actual challenges outside of the RAGCHAT application.  If there is no net code we can clone https://aka.ms/ragchat repo.  If there is net new code/scripts we will have to modify the environment setup instructions and copy necessary code to this repo. CH1 is manual data entry and challenge two reuses external repos with no new code set.  The one exception might be red teaming and observability.  We will refactor once each person's readme file is update to validate assumption.  -->
+We are grateful to the hard-work and thought leadership done by Pamela Fox and Matt Gotteiner. We were inspired and informed by their work.  We have reused their https://aka.ms/ragchat repo and studied their podcast series RAG Deep dive http://aka.ms/ragdeepdive.  We highly recommend to watch this content when preparing your applications to move into production.
+
+
+<!-- TThe current Microhack repo relies on all the source code from Azure-Search-OpenAI-Demo repo.  We plan to take a snapshot of this code in the next release and merge it into the Microhack repo.  This way we can better maintain change control while upgrading to Foundry v2.  -->
